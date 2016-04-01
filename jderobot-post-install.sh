@@ -11,6 +11,24 @@
 # Notice that cp `-f` could be mandatory instead.
 # State: beta.
 
+if [ $# -eq 0 ];
+then
+_jderobot_bashrc=1
+_gazebo_bashrc=1
+fi
+
+for i in $#
+do
+case $1 in
+'jderobot') _jderobot_bashrc=1 ;;
+'gazebo') _gazebo_bashrc=1 ;;
+'gazebo-files') _gazebo_files=1 ;;
+esac
+done
+
+
+if [ ${_gazebo_files}0 -ne 0 ]; then
+echo 'Copying Gazebo assets to $HOME...'
 # Inject cfg files (=Ice configs)
 mkdir -p ~/.gazebo/cfg
 cp -r /usr/local/share/jderobot/gazebo/plugins/*/*cfg ~/.gazebo/cfg
@@ -20,10 +38,12 @@ cp -r /usr/local/share/jderobot/gazebo/models ~/.gazebo
 
 # Add custom Worlds
 cp -r /usr/local/share/jderobot/gazebo/worlds ~/.gazebo
+fi
 
-
-# Inject Gazebo into environment (.bashrc)
+if [ ${_gazebo_bashrc}0 -ne 0 ]; then
+echo 'Injecting Gazebo into environment (.bashrc)...'
 grep -q 'gazebo-setup.sh' ~/.bashrc || cat<<EOF>>~/.bashrc
 test -z "\$GAZEBO_MASTER_URI" \\
   && source /usr/local/share/jderobot/gazebo/gazebo-setup.sh
 EOF
+fi
